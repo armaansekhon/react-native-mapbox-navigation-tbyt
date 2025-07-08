@@ -1,16 +1,22 @@
 package com.mapboxnavigation
 
+import com.facebook.react.uimanager.SimpleViewManager
 import com.facebook.react.uimanager.ThemedReactContext
-import com.facebook.react.uimanager.ViewManager
 import com.facebook.react.uimanager.annotations.ReactProp
 import com.facebook.react.uimanager.annotations.ReactPropGroup
-import com.mapbox.geojson.Point
 import com.facebook.react.common.MapBuilder
+import com.mapbox.geojson.Point
 import com.facebook.react.bridge.ReadableArray
 
-class MapboxNavigationViewManager : ViewManager<MapboxNavigationView, ThemedReactContext>() {
+data class WaypointLegs(val index: Int, val name: String)
+
+class MapboxNavigationViewManager : SimpleViewManager<MapboxNavigationView>() {
     override fun getName(): String {
         return "MapboxNavigationView"
+    }
+
+    override fun getShadowNodeClass(): Class<out com.facebook.react.uimanager.ReactShadowNode<*>> {
+        return com.facebook.react.uimanager.LayoutShadowNode::class.java
     }
 
     override fun createViewInstance(reactContext: ThemedReactContext): MapboxNavigationView {
@@ -22,11 +28,6 @@ class MapboxNavigationViewManager : ViewManager<MapboxNavigationView, ThemedReac
         view.onDropViewInstance()
     }
 
-    @ReactProp(name = "shouldSimulateRoute")
-override fun setShouldSimulateRoute(view: MapboxNavigationView?, value: Boolean) {
-    // No-op, as simulation is not needed
-}
-
     override fun getExportedCustomDirectEventTypeConstants(): Map<String, Any> {
         return MapBuilder.of(
             "onLocationChange", MapBuilder.of("registrationName", "onLocationChange"),
@@ -36,8 +37,6 @@ override fun setShouldSimulateRoute(view: MapboxNavigationView?, value: Boolean)
             "onArrive", MapBuilder.of("registrationName", "onArrive")
         )
     }
-
-    data class WaypointLegs(val index: Int, val name: String)
 
     @ReactPropGroup(names = ["startOrigin", "destination"])
     fun setCoordinates(view: MapboxNavigationView?, index: Int, value: ReadableArray?) {
