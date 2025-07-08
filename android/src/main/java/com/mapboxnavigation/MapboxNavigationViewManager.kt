@@ -22,6 +22,11 @@ class MapboxNavigationViewManager : ViewManager<MapboxNavigationView, ThemedReac
         view.onDropViewInstance()
     }
 
+    @ReactProp(name = "shouldSimulateRoute")
+override fun setShouldSimulateRoute(view: MapboxNavigationView?, value: Boolean) {
+    // No-op, as simulation is not needed
+}
+
     override fun getExportedCustomDirectEventTypeConstants(): Map<String, Any> {
         return MapBuilder.of(
             "onLocationChange", MapBuilder.of("registrationName", "onLocationChange"),
