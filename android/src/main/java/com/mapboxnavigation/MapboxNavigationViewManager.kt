@@ -65,6 +65,10 @@ fun setDirectionUnit(view: MapboxNavigationView?, value: String?) {
       view?.setDirectionUnit(value)
     }
   }
+@ReactProp(name = "separateLegs")
+override fun setSeparateLegs(view: MapboxNavigationView?, value: Boolean) {
+    // No-op for now, as separatesLegs is handled in setWaypoints
+}
 
   @ReactProp(name = "waypoints")
   override fun setWaypoints(view: MapboxNavigationView?, value: ReadableArray?) {
