@@ -807,13 +807,13 @@ class MapboxNavigationView(private val context: ThemedReactContext): FrameLayout
     initNavigation()
 }
 
-  fun setLocal(language: String) {
+ fun setLanguage(language: String) {
     val locals = language.split("-")
     when (locals.size) {
-      1 -> locale = Locale(locals.first())
-      2 -> locale = Locale(locals.first(), locals.last())
+        1 -> locale = Locale(locals.first())
+        2 -> locale = Locale(locals.first(), locals.last())
     }
-  }
+}
 
   fun setMute(mute: Boolean) {
     this.isVoiceInstructionsMuted = mute
