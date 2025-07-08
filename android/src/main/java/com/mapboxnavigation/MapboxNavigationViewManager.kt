@@ -1,14 +1,12 @@
 package com.mapboxnavigation
 
 import com.facebook.react.uimanager.ThemedReactContext
+import com.facebook.react.uimanager.ViewManager
 import com.facebook.react.uimanager.annotations.ReactProp
+import com.facebook.react.uimanager.annotations.ReactPropGroup
 import com.mapbox.geojson.Point
 import com.facebook.react.common.MapBuilder
-import com.facebook.react.uimanager.ViewManager
 import com.facebook.react.bridge.ReadableArray
-import com.facebook.react.uimanager.ViewManagerDelegate
-import com.facebook.react.uimanager.annotations.ReactPropGroup
-import com.mapboxnavigation.MapboxNavigationViewManager.WaypointLegs
 
 class MapboxNavigationViewManager : ViewManager<MapboxNavigationView, ThemedReactContext>() {
     override fun getName(): String {
@@ -54,7 +52,7 @@ class MapboxNavigationViewManager : ViewManager<MapboxNavigationView, ThemedReac
     }
 
     @ReactProp(name = "waypoints")
-    override fun setWaypoints(view: MapboxNavigationView?, value: ReadableArray?) {
+    fun setWaypoints(view: MapboxNavigationView?, value: ReadableArray?) {
         if (value == null) {
             view?.setWaypoints(listOf())
             view?.setWaypointLegs(listOf())
@@ -81,26 +79,26 @@ class MapboxNavigationViewManager : ViewManager<MapboxNavigationView, ThemedReac
     }
 
     @ReactProp(name = "distanceUnit")
-    override fun setDistanceUnit(view: MapboxNavigationView?, value: String?) {
+    fun setDistanceUnit(view: MapboxNavigationView?, value: String?) {
         if (value != null) {
             view?.setDistanceUnit(value)
         }
     }
 
     @ReactProp(name = "language")
-    override fun setLanguage(view: MapboxNavigationView?, language: String?) {
+    fun setLanguage(view: MapboxNavigationView?, language: String?) {
         if (language != null) {
             view?.setLanguage(language)
         }
     }
 
     @ReactProp(name = "shouldSimulateRoute")
-    override fun setShouldSimulateRoute(view: MapboxNavigationView?, value: Boolean) {
+    fun setShouldSimulateRoute(view: MapboxNavigationView?, value: Boolean) {
         view?.setShouldSimulateRoute(value)
     }
 
     @ReactProp(name = "separateLegs")
-    override fun setSeparateLegs(view: MapboxNavigationView?, value: Boolean) {
+    fun setSeparateLegs(view: MapboxNavigationView?, value: Boolean) {
         // No-op, as separatesLegs is handled in setWaypoints
     }
 
