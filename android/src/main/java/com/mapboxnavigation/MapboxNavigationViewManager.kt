@@ -58,13 +58,12 @@ class MapboxNavigationViewManager(private var reactContext: ReactApplicationCont
       view?.setDestinationTitle(value)
     }
   }
-
-  @ReactProp(name = "distanceUnit")
-fun setDirectionUnit(view: MapboxNavigationView?, value: String?) {
-    if (value != null)  {
-      view?.setDirectionUnit(value)
+@ReactProp(name = "distanceUnit")
+override fun setDistanceUnit(view: MapboxNavigationView?, value: String?) {
+    if (value != null) {
+        view?.setDistanceUnit(value) // Changed to setDistanceUnit
     }
-  }
+}
 @ReactProp(name = "separateLegs")
 override fun setSeparateLegs(view: MapboxNavigationView?, value: Boolean) {
     // No-op for now, as separatesLegs is handled in setWaypoints
