@@ -802,10 +802,10 @@ class MapboxNavigationView(private val context: ThemedReactContext): FrameLayout
     this.waypoints = waypoints
   }
 
-  fun setDirectionUnit(unit: String) {
+  fun setDistanceUnit(unit: String) {
     this.distanceUnit = unit
     initNavigation()
-  }
+}
 
   fun setLocal(language: String) {
     val locals = language.split("-")
