@@ -1,125 +1,123 @@
 package com.mapboxnavigation
 
-import com.facebook.react.module.annotations.ReactModule
-import com.facebook.react.bridge.ReactApplicationContext
-import com.facebook.react.bridge.ReadableArray
-import com.facebook.react.common.MapBuilder
 import com.facebook.react.uimanager.ThemedReactContext
 import com.facebook.react.uimanager.annotations.ReactProp
-import com.mapbox.api.directions.v5.models.DirectionsWaypoint
 import com.mapbox.geojson.Point
+import com.facebook.react.common.MapBuilder
+import com.facebook.react.uimanager.ViewManager
+import com.facebook.react.bridge.ReadableArray
+import com.facebook.react.uimanager.ViewManagerDelegate
+import com.facebook.react.uimanager.annotations.ReactPropGroup
+import com.mapboxnavigation.MapboxNavigationViewManager.WaypointLegs
 
-@ReactModule(name = MapboxNavigationViewManager.NAME)
-class MapboxNavigationViewManager(private var reactContext: ReactApplicationContext): MapboxNavigationViewManagerSpec<MapboxNavigationView>() {
-  override fun getName(): String {
-    return NAME
-  }
-
-  public override fun createViewInstance(context: ThemedReactContext): MapboxNavigationView {
-    return MapboxNavigationView(context)
-  }
-
-  override fun onDropViewInstance(view: MapboxNavigationView) {
-    view.onDropViewInstance()
-    super.onDropViewInstance(view)
-  }
-
-  override fun getExportedCustomDirectEventTypeConstants(): MutableMap<String, Map<String, String>> {
-    return MapBuilder.of(
-      "onLocationChange", MapBuilder.of("registrationName", "onLocationChange"),
-      "onError", MapBuilder.of("registrationName", "onError"),
-      "onCancelNavigation", MapBuilder.of("registrationName", "onCancelNavigation"),
-      "onArrive", MapBuilder.of("registrationName", "onArrive"),
-      "onRouteProgressChange", MapBuilder.of("registrationName", "onRouteProgressChange"),
-    )
-  }
-
-  @ReactProp(name = "startOrigin")
-  override fun setStartOrigin(view: MapboxNavigationView?, value: ReadableArray?) {
-    if (value == null) {
-      view?.setStartOrigin(null)
-      return
+class MapboxNavigationViewManager : ViewManager<MapboxNavigationView, ThemedReactContext>() {
+    override fun getName(): String {
+        return "MapboxNavigationView"
     }
-    view?.setStartOrigin(Point.fromLngLat(value.getDouble(0), value.getDouble(1)))
-  }
 
-  @ReactProp(name = "destination")
-  override fun setDestination(view: MapboxNavigationView?, value: ReadableArray?) {
-    if (value == null) {
-      view?.setDestination(null)
-      return
+    override fun createViewInstance(reactContext: ThemedReactContext): MapboxNavigationView {
+        return MapboxNavigationView(reactContext)
     }
-    view?.setDestination(Point.fromLngLat(value.getDouble(0), value.getDouble(1)))
-  }
 
-  @ReactProp(name = "destinationTitle")
-  override fun setDestinationTitle(view: MapboxNavigationView?, value: String?) {
-    if (value != null) {
-      view?.setDestinationTitle(value)
+    override fun onDropViewInstance(view: MapboxNavigationView) {
+        super.onDropViewInstance(view)
+        view.onDropViewInstance()
     }
-  }
-@ReactProp(name = "distanceUnit")
-override fun setDistanceUnit(view: MapboxNavigationView?, value: String?) {
-    if (value != null) {
-        view?.setDistanceUnit(value) // Changed to setDistanceUnit
+
+    override fun getExportedCustomDirectEventTypeConstants(): Map<String, Any> {
+        return MapBuilder.of(
+            "onLocationChange", MapBuilder.of("registrationName", "onLocationChange"),
+            "onRouteProgressChange", MapBuilder.of("registrationName", "onRouteProgressChange"),
+            "onError", MapBuilder.of("registrationName", "onError"),
+            "onCancelNavigation", MapBuilder.of("registrationName", "onCancelNavigation"),
+            "onArrive", MapBuilder.of("registrationName", "onArrive")
+        )
     }
-}
-@ReactProp(name = "separateLegs")
-override fun setSeparateLegs(view: MapboxNavigationView?, value: Boolean) {
-    // No-op for now, as separatesLegs is handled in setWaypoints
-}
 
-  @ReactProp(name = "waypoints")
-  override fun setWaypoints(view: MapboxNavigationView?, value: ReadableArray?) {
-    if (value == null) {
-      view?.setWaypoints(listOf())
-      return
+    data class WaypointLegs(val index: Int, val name: String)
+
+    @ReactPropGroup(names = ["startOrigin", "destination"])
+    fun setCoordinates(view: MapboxNavigationView?, index: Int, value: ReadableArray?) {
+        if (value == null) return
+        val point = Point.fromLngLat(value.getDouble(0), value.getDouble(1))
+        when (index) {
+            0 -> view?.setStartOrigin(point)
+            1 -> view?.setDestination(point)
+        }
     }
-    val legs = mutableListOf<WaypointLegs>()
-    val waypoints: List<Point> = value.toArrayList().mapIndexedNotNull { index, item ->
-      val map = item as? Map<*, *>
-      val latitude = map?.get("latitude") as? Double
-      val longitude = map?.get("longitude") as? Double
-      val name = map?.get("name") as? String
-      val separatesLegs = map?.get("separatesLegs") as? Boolean
-      if (separatesLegs != false) {
-        legs.add(WaypointLegs(index = index + 1, name = name ?: "waypoint-$index"))
-      }
-      if (latitude != null && longitude != null) {
-        Point.fromLngLat(longitude, latitude)
-      } else {
-        null
-      }
+
+    @ReactProp(name = "destinationTitle")
+    fun setDestinationTitle(view: MapboxNavigationView?, title: String?) {
+        if (title != null) {
+            view?.setDestinationTitle(title)
+        }
     }
-    view?.setWaypointLegs(legs)
-    view?.setWaypoints(waypoints)
-  }
 
-  @ReactProp(name = "language")
-override fun setLanguage(view: MapboxNavigationView?, language: String?) {
-    if (language != null) {
-        view?.setLanguage(language) // Changed to setLanguage
+    @ReactProp(name = "waypoints")
+    override fun setWaypoints(view: MapboxNavigationView?, value: ReadableArray?) {
+        if (value == null) {
+            view?.setWaypoints(listOf())
+            view?.setWaypointLegs(listOf())
+            return
+        }
+        val legs = mutableListOf<WaypointLegs>()
+        val waypoints: List<Point> = value.toArrayList().mapIndexedNotNull { index, item ->
+            val map = item as? Map<*, *>
+            val latitude = map?.get("latitude") as? Double
+            val longitude = map?.get("longitude") as? Double
+            val name = map?.get("name") as? String
+            val separatesLegs = map?.get("separatesLegs") as? Boolean
+            if (latitude != null && longitude != null) {
+                if (separatesLegs != false) {
+                    legs.add(WaypointLegs(index = index + 1, name = name ?: "waypoint-$index"))
+                }
+                Point.fromLngLat(longitude, latitude)
+            } else {
+                null
+            }
+        }
+        view?.setWaypointLegs(legs)
+        view?.setWaypoints(waypoints)
     }
-}
 
-  @ReactProp(name = "showCancelButton")
-  override fun setShowCancelButton(view: MapboxNavigationView?, value: Boolean) {
-    view?.setShowCancelButton(value)
-  }
-
-  @ReactProp(name = "mute")
-  override fun setMute(view: MapboxNavigationView?, value: Boolean) {
-    view?.setMute(value)
-  }
-
-  @ReactProp(name = "travelMode")
-  override fun setTravelMode(view: MapboxNavigationView?, value: String?) {
-    if (value != null)  {
-      view?.setTravelMode(value)
+    @ReactProp(name = "distanceUnit")
+    override fun setDistanceUnit(view: MapboxNavigationView?, value: String?) {
+        if (value != null) {
+            view?.setDistanceUnit(value)
+        }
     }
-  }
 
-  companion object {
-    const val NAME = "MapboxNavigationView"
-  }
+    @ReactProp(name = "language")
+    override fun setLanguage(view: MapboxNavigationView?, language: String?) {
+        if (language != null) {
+            view?.setLanguage(language)
+        }
+    }
+
+    @ReactProp(name = "shouldSimulateRoute")
+    override fun setShouldSimulateRoute(view: MapboxNavigationView?, value: Boolean) {
+        view?.setShouldSimulateRoute(value)
+    }
+
+    @ReactProp(name = "separateLegs")
+    override fun setSeparateLegs(view: MapboxNavigationView?, value: Boolean) {
+        // No-op, as separatesLegs is handled in setWaypoints
+    }
+
+    @ReactProp(name = "mute")
+    fun setMute(view: MapboxNavigationView?, mute: Boolean) {
+        view?.setMute(mute)
+    }
+
+    @ReactProp(name = "showCancelButton")
+    fun setShowCancelButton(view: MapboxNavigationView?, show: Boolean) {
+        view?.setShowCancelButton(show)
+    }
+
+    @ReactProp(name = "travelMode")
+    fun setTravelMode(view: MapboxNavigationView?, mode: String?) {
+        if (mode != null) {
+            view?.setTravelMode(mode)
+        }
+    }
 }
