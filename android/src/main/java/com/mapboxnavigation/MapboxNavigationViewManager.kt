@@ -96,11 +96,11 @@ override fun setSeparateLegs(view: MapboxNavigationView?, value: Boolean) {
   }
 
   @ReactProp(name = "language")
- fun setLocal(view: MapboxNavigationView?, language: String?) {
-    if (language !== null) {
-      view?.setLocal(language)
+override fun setLanguage(view: MapboxNavigationView?, language: String?) {
+    if (language != null) {
+        view?.setLanguage(language) // Changed to setLanguage
     }
-  }
+}
 
   @ReactProp(name = "showCancelButton")
   override fun setShowCancelButton(view: MapboxNavigationView?, value: Boolean) {
