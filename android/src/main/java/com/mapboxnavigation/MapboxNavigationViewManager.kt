@@ -60,7 +60,7 @@ class MapboxNavigationViewManager(private var reactContext: ReactApplicationCont
   }
 
   @ReactProp(name = "distanceUnit")
-  override fun setDirectionUnit(view: MapboxNavigationView?, value: String?) {
+fun setDirectionUnit(view: MapboxNavigationView?, value: String?) {
     if (value != null)  {
       view?.setDirectionUnit(value)
     }
@@ -93,7 +93,7 @@ class MapboxNavigationViewManager(private var reactContext: ReactApplicationCont
   }
 
   @ReactProp(name = "language")
-  override fun setLocal(view: MapboxNavigationView?, language: String?) {
+ fun setLocal(view: MapboxNavigationView?, language: String?) {
     if (language !== null) {
       view?.setLocal(language)
     }
